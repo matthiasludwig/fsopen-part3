@@ -1,0 +1,25 @@
+{
+  "name": "fsopen-part3",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matthiasludwig/fsopen-part3.git"
+  },
+  "author": "Matthias Ludwig",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/matthiasludwig/fsopen-part3/issues"
+  },
+  "homepage": "https://github.com/matthiasludwig/fsopen-part3#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
