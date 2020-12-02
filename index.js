@@ -31,6 +31,20 @@ app.get('/api/persons', (request, response) => {
     response.json(notes);
 });
 
+app.get('/api/persons/:id', (request, response) => {
+    const idPerson = Number(request.params.id);
+    const contact = notes.find(item => item.id === idPerson)
+
+    console.log(contact);
+
+    if (contact) {
+        response.json(contact);
+    }
+    else {
+        response.status(404).end();
+    }
+})
+
 app.get('/info', (request, response) => {
     response.send(`<p>Phonebook as info for ${notes.length} people</p> <p>${date}</p>`);
 })
