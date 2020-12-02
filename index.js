@@ -4,36 +4,40 @@ const app = express();
 
 const PORT = 3001;
 
-let notes = [
+const persons = [
     {
-        id: 1,
-        content: "HTML is easy",
-        date: "2019-05-30T17:30:31.098Z",
-        important: true
+      name: "Arto Hellas",
+      number: "040-12345",
+      id: 1
     },
     {
-        id: 2,
-        content: "Browser can execute only Javascript",
-        date: "2019-05-30T18:39:34.091Z",
-        important: false
+      name: "Ada Lovelace",
+      number: "39-44-5323523",
+      id: 2
     },
     {
-        id: 3,
-        content: "GET and POST are the most important methods of HTTP protocol",
-        date: "2019-05-30T19:20:14.298Z",
-        important: true
+      name: "Dan Abramov",
+      number: "12-43-234345",
+      id: 3
+    },
+    {
+      name: "Mary Poppendieck",
+      number: "39-23-6423122",
+      id: 4
     }
-]
+  ]
 
 const date = new Date();
 
+// Handling Persons Get Requests
+
 app.get('/api/persons', (request, response) => {
-    response.json(notes);
+    response.json(persons);
 });
 
 app.get('/api/persons/:id', (request, response) => {
     const idPerson = Number(request.params.id);
-    const contact = notes.find(item => item.id === idPerson)
+    const contact = persons.find(item => item.id === idPerson)
 
     console.log(contact);
 
@@ -45,8 +49,17 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
+// Handling Persons Delete Requests
+
+app.delete('/api/persons/:id', (request, response) => {
+    console.log(request.params.id);
+})
+
+
+// Display Info Site
+
 app.get('/info', (request, response) => {
-    response.send(`<p>Phonebook as info for ${notes.length} people</p> <p>${date}</p>`);
+    response.send(`<p>Phonebook as info for ${persons.length} people</p> <p>${date}</p>`);
 })
 
 app.listen(PORT, () => {
