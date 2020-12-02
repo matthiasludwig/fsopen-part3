@@ -25,9 +25,15 @@ let notes = [
     }
 ]
 
+const date = new Date();
+
 app.get('/api/persons', (request, response) => {
     response.json(notes);
 });
+
+app.get('/info', (request, response) => {
+    response.send(`<p>Phonebook as info for ${notes.length} people</p> <p>${date}</p>`);
+})
 
 app.listen(PORT, () => {
     console.log(`Server running on ${PORT}.`);
