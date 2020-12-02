@@ -2,6 +2,8 @@ const { request } = require('express');
 const express = require('express');
 const app = express();
 
+app.use(express.json());
+
 const PORT = 3001;
 
 let persons = [
@@ -27,7 +29,12 @@ let persons = [
     }
   ]
 
+// Helper functions and variables
+
 const date = new Date();
+const generateId = () => {
+    return Math.floor(Math.random() * 1000);
+}
 
 // Handling Persons Get Requests
 
@@ -58,6 +65,34 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end();
 })
 
+// Handling Persons Post Requests
+
+app.post('/api/persons', (request, response) => {
+    const body = request.body;
+    const nameExists = persons.find(item => item.name === body.name);
+
+    if (!(body.name && body.number)) {
+        return response.status(400).json({
+            error: "name or number missing"
+        })
+    }
+
+    else if (nameExists) {
+        return response.status(400).json({
+            error: "name already exists"
+        })
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generateId()
+    }
+
+    persons = persons.concat(person);
+
+    response.json(person);
+});
 
 // Display Info Site
 
