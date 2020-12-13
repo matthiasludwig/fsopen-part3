@@ -34,7 +34,7 @@ let persons = [
 morgan.token('body', function (req, res) {
     return JSON.stringify(req.body);
 });
-const middleware = morgan(':method :url :status :res[content-length] - :response-time ms :body');
+const middleware = morgan(':method :remote-addr :url :status :res[content-length] - :response-time ms :body');
 
 app.use(express.static('build'));
 app.use(middleware);
