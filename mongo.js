@@ -7,16 +7,22 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2];
 
+// Connection
+
 const url = `mongodb+srv://fullstack:${password}@phonebook.d2pdo.mongodb.net/phonebook?retryWrites=true&w=majority`;
 
 mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true});
 
+// Creation of Schema and mongoose Model
+
 const personSchema = mongoose.Schema({
     name: String,
-    number: Number
+    number: String
 });
 
 const Person = mongoose.model('Person', personSchema);
+
+// If a new user should be created (by passing the right cmd arguments)
 
 if (process.argv.length === 5) {
     const newName = process.argv[3];
