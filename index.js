@@ -29,30 +29,31 @@ app.get('/api/persons', (request, response) => {
     })
 });
 
-app.get('/api/persons/:id', (request, response) => {
-    Person.findById(request.params.id).then(person => {
-        response.json(person);
-    });
+app.get('/api/persons/:id', (request, response, next) => {
+    Person.findById(request.params.id)
+        .then(person => {
+            response.json(person);
+        })
+        .catch(error => next(error));
 })
 
 // Handling Persons Delete Requests
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id);
-
-    persons = persons.filter(person => person.id !== id);
-    response.status(204).end();
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndDelete(request.params.id)
+        .then(res => {
+            response.status(204).end();
+        })
+        .catch(error => next(error));
 })
 
 // Handling Persons Post Requests
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body;
 
     if (!(body.name && body.number)) {
-        return response.status(400).json({
-            error: "name or number missing"
-        })
+        return response.status(400).send({ error: "name or number missing" });
     }
 
     const person = new Person({
@@ -60,16 +61,70 @@ app.post('/api/persons', (request, response) => {
         number: body.number
     });
 
-    person.save().then(newPerson => {
-        response.json(newPerson);
-    })
+    person.save()
+        .then(newPerson => {
+            response.json(newPerson);
+        })
+        .catch(error => next(error));
 });
+
+// Handling Person Update Request
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body;
+
+    if(!(body.name && body.number)) {
+        return response.status(400).send({ error: "name or number missing" });
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number
+    };
+
+    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+        .then(updatedPerson => {
+            if (updatedPerson === null) {
+                response.status(404).send({ error: "Note is missing from server" });
+            }
+            response.json(updatedPerson);
+        })
+        .catch(error => next(error));
+})
 
 // Display Info Site
 
-app.get('/info', (request, response) => {
-    response.send(`<p>Phonebook as info for ${persons.length} people</p> <p>${date}</p>`);
+app.get('/info', (request, response, next) => {
+    const date = new Date();
+    let phonebookLength;
+    Person.find({})
+        .then(phonebook => {
+            phonebookLength = phonebook.length;
+            response.send(`<p>Phonebook has info for ${phonebookLength} people</p> <p>${date}</p>`);
+        })
+        .catch(error => next(error));
 })
+
+// Middleware Unknown Endpoints & Error Logging
+
+const unkownEndpoint = (request, response) => {
+    response.status(404).send({ error: "unknown endpoint" });
+}
+
+app.use(unkownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message);
+
+    if (error.name === "CastError") {
+        return response.status(400).send({ error: "malformed id" });
+    }
+    next(error);
+}
+
+app.use(errorHandler);
+
+// Start express server
 
 app.listen(PORT, () => {
     console.log(`Server running on ${PORT}.`);
