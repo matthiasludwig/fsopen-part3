@@ -2,33 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const Person = require('./models/people');
 
 const app = express();
 
-const PORT = process.env.PORT || 3001;
-
-let persons = [
-    {
-      name: "Arto Hellas",
-      number: "040-12345",
-      id: 1
-    },
-    {
-      name: "Ada Lovelace",
-      number: "39-44-5323523",
-      id: 2
-    },
-    {
-      name: "Dan Abramov",
-      number: "12-43-234345",
-      id: 3
-    },
-    {
-      name: "Mary Poppendieck",
-      number: "39-23-6423122",
-      id: 4
-    }
-  ]
+const PORT = process.env.PORT;
 
 // Middleware
 
@@ -43,31 +21,18 @@ app.use(express.json());
 app.use(cors());
 
 
-// Helper functions and variables
-
-const date = new Date();
-const generateId = () => {
-    return Math.floor(Math.random() * 1000);
-}
-
 // Handling Persons Get Requests
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons);
+    Person.find({}).then(phonebook => {
+        response.json(phonebook);
+    })
 });
 
 app.get('/api/persons/:id', (request, response) => {
-    const idPerson = Number(request.params.id);
-    const contact = persons.find(item => item.id === idPerson)
-
-    console.log(contact);
-
-    if (contact) {
-        response.json(contact);
-    }
-    else {
-        response.status(404).end();
-    }
+    Person.findById(request.params.id).then(person => {
+        response.json(person);
+    });
 })
 
 // Handling Persons Delete Requests
@@ -83,7 +48,6 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
     const body = request.body;
-    const nameExists = persons.find(item => item.name === body.name);
 
     if (!(body.name && body.number)) {
         return response.status(400).json({
@@ -91,21 +55,14 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    else if (nameExists) {
-        return response.status(400).json({
-            error: "name already exists"
-        })
-    }
-
-    const person = {
+    const person = new Person({
         name: body.name,
-        number: body.number,
-        id: generateId()
-    }
+        number: body.number
+    });
 
-    persons = persons.concat(person);
-
-    response.json(person);
+    person.save().then(newPerson => {
+        response.json(newPerson);
+    })
 });
 
 // Display Info Site
