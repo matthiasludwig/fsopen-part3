@@ -1,40 +1,40 @@
-const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
+const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
 
-const url = process.env.MONGODB_URI;
+const url = process.env.MONGODB_URI
 
-mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true})
-    .then(result => {
-        console.log('Successfully connected to mongodb');
-    })
-    .catch(error => {
-        console.log(`error while connecting to mongodb: ${error}`);
-    });
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
+	.then(result => {
+		console.log('Successfully connected to mongodb', result)
+	})
+	.catch(error => {
+		console.log(`error while connecting to mongodb: ${error}`)
+	})
 
 // Creation of Schema and mongoose Model
 
 const personSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        minlength: 3,
-        required: true,
-        unique: true
-    },
-    number: {
-        type: String,
-        minlength: 8,
-        required: true
-    }
-});
-
-personSchema.plugin(uniqueValidator);
-
-personSchema.set('toJSON', {
-    transform: (document, returnedObject) => {
-        returnedObject.id = returnedObject._id.toString();
-        delete returnedObject._id;
-        delete returnedObject.__v;
-    }
+	name: {
+		type: String,
+		minlength: 3,
+		required: true,
+		unique: true
+	},
+	number: {
+		type: String,
+		minlength: 8,
+		required: true
+	}
 })
 
-module.exports = mongoose.model('Person', personSchema);
+personSchema.plugin(uniqueValidator)
+
+personSchema.set('toJSON', {
+	transform: (document, returnedObject) => {
+		returnedObject.id = returnedObject._id.toString()
+		delete returnedObject._id
+		delete returnedObject.__v
+	}
+})
+
+module.exports = mongoose.model('Person', personSchema)
