@@ -87,7 +87,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         number: body.number
     };
 
-    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+    Person.findByIdAndUpdate(request.params.id, person, {new: true, runValidators: true})
         .then(updatedPerson => {
             if (updatedPerson === null) {
                 response.status(404).send({ error: `Note "${person.name}" is missing from server` });
