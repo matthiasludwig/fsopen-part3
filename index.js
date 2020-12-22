@@ -46,7 +46,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
                 response.status(204).end();
             }
             else {
-                response.status(404).end();
+                response.status(404).send({ error: `The requested Note is missing from server` });
             }
         })
         .catch(error => next(error));
@@ -66,10 +66,10 @@ app.post('/api/persons', (request, response, next) => {
         number: body.number
     });
 
-    person.save()
-        .then(newPerson => {
-            response.json(newPerson);
-        })
+    person
+        .save()
+        .then(savedPerson => savedPerson.toJSON())
+        .then(savedAndFormattedPerson => response.json(savedAndFormattedPerson))
         .catch(error => next(error));
 });
 
@@ -90,7 +90,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndUpdate(request.params.id, person, {new: true})
         .then(updatedPerson => {
             if (updatedPerson === null) {
-                response.status(404).send({ error: "Note is missing from server" });
+                response.status(404).send({ error: `Note "${person.name}" is missing from server` });
             }
             response.json(updatedPerson);
         })
@@ -119,10 +119,8 @@ const unkownEndpoint = (request, response) => {
 app.use(unkownEndpoint);
 
 const errorHandler = (error, request, response, next) => {
-    console.log(error.message);
-
-    if (error.name === "CastError") {
-        return response.status(400).send({ error: "malformed id" });
+    if (error.name === "CastError" || error.name === "ValidationError") {
+        return response.status(400).send({ error: error.message });
     }
     next(error);
 }
