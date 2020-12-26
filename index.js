@@ -92,7 +92,9 @@ app.put('/api/persons/:id', (request, response, next) => {
 			if (updatedPerson === null) {
 				response.status(404).send({ error: `Note "${person.name}" is missing from server` })
 			}
-			response.json(updatedPerson)
+			else {
+				response.json(updatedPerson)
+			}
 		})
 		.catch(error => next(error))
 })
